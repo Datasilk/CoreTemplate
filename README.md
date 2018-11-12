@@ -16,11 +16,36 @@ This project is meant to be forked and used as a starting point for developing l
 
 ## Installation
 
-1. Clone the repository:
+* **Clone the repository:**
 
-    ```git clone --recurse-submodules http://github.com/datasilk/coretemplate YourProjectName```
+    ```
+	git clone --recurse-submodules http://github.com/datasilk/coretemplate YourProjectName
+	```
 
 	> NOTE: replace `YourProjectName` with the name of your project
+
+* **Alternatively, clone the repository into your own repository:**
+	
+	1. Clone the **bare** repository
+
+	```
+	git clone --bare http://github.com/datasilk/coretemplate YourProjectName
+	cd YourProjectName
+	```
+
+	2. Push the cloned repository into your own repository & delete original cloned **folder**
+	
+	```
+	git push --mirror http://github.com/YourAccount/YourRepository
+	cd ..
+	rm -rf YourProjectName
+	```
+
+	3. Clone **your** repository
+
+	```
+	git clone --recursive http://github.com/YourAccount/YourRepository
+	```
 
 2. Replace all case-sensitive instances of `CoreTemplate` to `YourProjectName` and `coretemplate` to `yourprojectname` in all files within the repository
 3. Rename file `CoreTemplate.sln` to `YourProjectName.sln` and file `App/CoreTemplate.csproj` to `App/YourProjectName.csproj`
@@ -41,11 +66,11 @@ This project is meant to be forked and used as a starting point for developing l
     * Default web page for URL `/` is `/Pages/Home/Home.cs`
     * Dashboard contains a sidebar with a menu system
     * UI provided by [Tapestry](http://github.com/Websilk/Tapestry), a **CSS/LESS** UI framework.
-    * Javascript uses [Selector](http://github.com/websilk/selector) as a light-weight replacement for jQuery
+    * Javascript uses [Selector](http://github.com/Websilk/Selector) as a light-weight replacement for jQuery (under 5KB)
 	* [Datasilk Core Js](http://github.com/Datasilk/CoreJs) is used as a simple **client-side framework** for structuring page-level Javascript code, making AJAX requests, and calling utility functions
 	* Build **MVC** web pages using html files & **scaffolding variables**. For example:
      
-#### Example: HTML with Scaffolding variables & blocks
+**Example: HTML with Scaffolding variables & blocks**
 ```
 <html><body>
 	<div class="menu">{{menu}}</div>
