@@ -1,12 +1,11 @@
 {
-  "assembly":  "CoreTemplate",
+  "assembly": "CoreTemplate",
   "environment": "development",
-  "port": "80",
+  "port": "7000",
   "sql": {
     "active": "SqlServerTrusted",
     "SqlServerTrusted": "server=.\\SQL2017; database=CoreTemplate; Trusted_Connection=true"
   },
-
   "encryption": {
     "salt": "?",
     "bcrypt_work_factor": "10"

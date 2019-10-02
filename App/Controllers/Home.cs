@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace CoreTemplate.Pages
+namespace CoreTemplate.Controllers
 {
-    public class Home : Page
+    public class Home : Controller
     {
-        public Home(HttpContext context) : base(context)
+        public Home(HttpContext context, Parameters parameters) : base(context, parameters)
         {
         }
 
         public override string Render(string[] path, string body = "", object metadata = null)
         {
-            var scaffold = new Scaffold("/Views/Home/home.html", Server.Scaffold);
+            var scaffold = new Scaffold("/Views/Home/home.html");
             
             if(User.userId > 0)
             {
-                scaffold.Data["user"] = "1";
-                scaffold.Data["username"] = User.name;
+                scaffold.Show("user");
+                scaffold["username"] = User.name;
             }
             else
             {
-                scaffold.Data["no-user"] = "1";
+                scaffold.Show("no-user");
             }
 
             //load header since it was included in home.html

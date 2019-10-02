@@ -4,7 +4,6 @@ namespace Query
 {
     public static class Users
     {
-
         public static int CreateUser(Models.User user)
         {
             return Sql.ExecuteScalar<int>(

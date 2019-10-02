@@ -2,9 +2,9 @@
 
 namespace CoreTemplate
 {
-    public class Page : Datasilk.Page
+    public class Controller : Datasilk.Mvc.Controller
     {
-        public Page(HttpContext context) : base(context)
+        public Controller(HttpContext context, Parameters parameters) : base(context, parameters)
         {
             title = "CoreTemplate";
             description = "You can do everything you ever wanted";
@@ -20,11 +20,11 @@ namespace CoreTemplate
         {
             if(User.userId > 0)
             {
-                scaffold.Child("header").Data["user"] = "1";
+                scaffold.Child("header").Show("user");
             }
             else
             {
-                scaffold.Child("header").Data["no-user"] = "1";
+                scaffold.Child("header").Show("no-user");
             }
         }
     }
