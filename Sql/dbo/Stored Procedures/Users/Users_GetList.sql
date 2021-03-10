@@ -1,25 +1,37 @@
 ﻿CREATE PROCEDURE [dbo].[Users_GetList]
-	@userId int = 0, 
-	@start int = 1,
+	@page int = 1,
 	@length int = 10,
 	@search nvarchar(MAX) = '',
-	@orderby int = 1
+	@orderby int = 0
 AS
 BEGIN
 	SET NOCOUNT ON;
-	SELECT *
-	FROM (
-		SELECT ROW_NUMBER() 
-		OVER (ORDER BY
-		CASE WHEN @orderby = 0 THEN [name] END DESC,
-		CASE WHEN @orderby = 1 THEN email END DESC,
-		CASE WHEN @orderby = 2 THEN datecreated END ASC
-		) as rownum, *
-		FROM Users
-		WHERE 
-		userId = CASE WHEN @userId > 0 THEN @userId ELSE userId END
-		AND [name] LIKE CASE WHEN @search <> '' THEN '%' + @search + '%' ELSE [name] END
-		AND email  LIKE CASE WHEN @search <> '' THEN '%' + @search + '%' ELSE email END
-	) as myTable
-	WHERE rownum >= @start AND  rownum <= @start + @length
+
+	SELECT u.*, sec.total AS [security]
+	FROM Users u
+	
+	CROSS APPLY (
+		SELECT 
+		CASE WHEN u.userId = 1 THEN 999
+		ELSE COUNT(*) END AS total
+		FROM Security_Keys sk
+		WHERE sk.groupId IN (SELECT groupId FROM Security_Users WHERE userId=u.userId)
+		AND sk.isplatform = 1
+	) AS sec
+
+	WHERE 
+	(
+		(@search <> '' AND 
+			(
+				u.[name] LIKE '%' + @search + '%'
+				OR u.email LIKE '%' + @search + '%'
+			)
+			OR @search = ''
+		)
+	)
+	ORDER BY sec.total DESC,
+	CASE WHEN @orderby = 0 THEN u.userId END ASC,
+	CASE WHEN @orderby = 1 THEN u.email END ASC,
+	CASE WHEN @orderby = 2 THEN u.datecreated END DESC
+	OFFSET @length * (@page - 1) ROWS FETCH NEXT @length ROWS ONLY
 END

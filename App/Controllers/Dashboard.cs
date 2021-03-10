@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
 
 namespace CoreTemplate.Controllers
 {
     public class Dashboard: Controller
     {
-        public Dashboard(HttpContext context, Parameters parameters) : base(context, parameters)
-        {
-        }
-
         public struct structMenuItem
         {
             public string label;
@@ -21,28 +16,28 @@ namespace CoreTemplate.Controllers
             public List<structMenuItem> submenu;
         }
 
-        public override string Render(string[] path, string body = "", object metadata = null)
+        public override string Render(string body = "")
         {
             //check security
-            if (!CheckSecurity()) { return AccessDenied(new Login(context, parameters)); }
+            if (!CheckSecurity()) { return AccessDenied<Login>(); }
 
             //set up client-side dependencies
             AddCSS("/css/views/dashboard/dashboard.css");
             AddScript("js/views/dashboard/dashboard.js");
 
             //load the dashboard layout
-            var scaffold = new Scaffold("/Views/Dashboard/dashboard.html");
-            var scaffMenu = new Scaffold("/Views/Dashboard/menu-item.html");
+            var view = new View("/Views/Dashboard/dashboard.html");
+            var scaffMenu = new View("/Views/Dashboard/menu-item.html");
 
             //load user profile
-            scaffold["profile-img"] = "";
-            scaffold["btn-edit-img"] = "";
-            scaffold["profile-name"] = User.displayName;
+            view["profile-img"] = "";
+            view["btn-edit-img"] = "";
+            view["profile-name"] = User.DisplayName;
 
             //load website info
-            scaffold["website-name"] = title;
-            scaffold["website-url"] = "http://coretemplate.datasilk.io";
-            scaffold["website-url-name"] = "coretemplate.datasilk.io";
+            view["website-name"] = Title;
+            view["website-url"] = "http://coretemplate.datasilk.io";
+            view["website-url-name"] = "coretemplate.datasilk.io";
 
             //generate menu system
             var menu = new StringBuilder();
@@ -56,10 +51,10 @@ namespace CoreTemplate.Controllers
             {
                 menu.Append(renderMenuItem(scaffMenu, item, 0));
             }
-            scaffold["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
+            view["menu"] = "<ul class=\"menu\">" + menu.ToString() + "</ul>";
 
             //get dashboard section name
-            var subPath = context.Request.Path.ToString().Replace("dashboard", "").Substring(1);
+            var subPath = Context.Request.Path.ToString().Replace("dashboard", "").Substring(1);
             if(subPath == "" || subPath == "/") { subPath = "timeline"; }
             var html = "";
 
@@ -68,17 +63,17 @@ namespace CoreTemplate.Controllers
             var t = LoadSubPage(subPath);
             subpage = t.Item1;
             html = t.Item2;
-            if (html == "") { return AccessDenied(new Login(context, parameters)); }
-            scaffold["body"] = html;
+            if (html == "") { return AccessDenied<Login>(); }
+            view["body"] = html;
 
             //set up page info
-            title = title + " - Dashboard - " + subpage.title;
+            Title = Title + " - Dashboard - " + subpage.Title;
 
             //include dashboard section javascript dependencies
-            scripts.Append(subpage.scripts);
+            Scripts.Append(subpage.Scripts);
 
             //render base layout along with dashboard section
-            return base.Render(path, scaffold.Render());
+            return base.Render(view.Render());
         }
 
         private Tuple<Controller, string> LoadSubPage(string path)
@@ -91,11 +86,12 @@ namespace CoreTemplate.Controllers
 
             if (paths[0] == "timeline")
             {
-                service = new DashboardPages.Timeline(context, parameters);
+                service = new DashboardPages.Timeline();
+                service.Context = Context;
             }
             
             //render sub page
-            html = service.Render(subpath);
+            html = service.Render();
 
             return new Tuple<Controller, string>(service, html);
         }
@@ -111,7 +107,7 @@ namespace CoreTemplate.Controllers
             return menu;
         }
 
-        private string renderMenuItem(Scaffold scaff, structMenuItem item, int level = 0)
+        private string renderMenuItem(View scaff, structMenuItem item, int level = 0)
         {
             var gutter = "";
             var subs = new StringBuilder();

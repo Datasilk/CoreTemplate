@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using Datasilk.Core.Web;
 
-public class Routes : Datasilk.Web.Routes
+public class Routes : Datasilk.Core.Web.Routes
 {
-    public override Datasilk.Mvc.Controller FromControllerRoutes(HttpContext context, Parameters parameters, string name)
+    public override IController FromControllerRoutes(HttpContext Context, Parameters parameters, string name)
     {
         switch (name)
         {
-            case "": case "home": return new CoreTemplate.Controllers.Home(context, parameters);
-            case "login": return new CoreTemplate.Controllers.Login(context, parameters);
+            case "": case "home": return new CoreTemplate.Controllers.Home();
+            case "login": return new CoreTemplate.Controllers.Login();
         }
         return null;
     }

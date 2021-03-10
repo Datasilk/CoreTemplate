@@ -1,31 +1,56 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
 
 namespace CoreTemplate
 {
-    public class Controller : Datasilk.Mvc.Controller
+    public class Controller : Datasilk.Core.Web.Controller
     {
-        public Controller(HttpContext context, Parameters parameters) : base(context, parameters)
-        {
-            title = "CoreTemplate";
-            description = "You can do everything you ever wanted";
-        }
+        public string Title { get; set; }
+        public string Description { get; set; }
 
-        public override string Render(string[] path, string body = "", object metadata = null)
-        {
-            scripts.Append("<script language=\"javascript\">S.svg.load('/images/icons.svg');</script>");
-            return base.Render(path, body, metadata);
-        }
+        private User user;
 
-        public void LoadHeader(ref Scaffold scaffold)
-        {
-            if(User.userId > 0)
+        public User User { get
             {
-                scaffold.Child("header").Show("user");
+                if(user == null)
+                {
+                    user = new User();
+                }
+                return user;
+            } 
+        }
+
+        public override string Render(string body = "")
+        {
+            Title = "CoreTemplate";
+            Description = "You can do everything you ever wanted";
+            Scripts.Append("<script language=\"javascript\">S.svg.load('/images/icons.svg');</script>");
+            return base.Render(body);
+        }
+
+        public void LoadHeader(ref View view)
+        {
+            if(User.UserId > 0)
+            {
+                view.Child("header").Show("user");
             }
             else
             {
-                scaffold.Child("header").Show("no-user");
+                view.Child("header").Show("no-user");
             }
+        }
+
+        public bool CheckSecurity(string key = "")
+        {
+            if (User.UserId == 1) { return true; }
+            if (key != "" && User.UserId > 0 && !User.Keys.Any(a => a.Key == key && a.Value == true))
+            {
+                return false;
+            }
+            else if (key == "" && User.UserId <= 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
