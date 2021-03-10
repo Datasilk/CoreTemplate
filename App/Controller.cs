@@ -4,8 +4,9 @@ namespace CoreTemplate
 {
     public class Controller : Datasilk.Core.Web.Controller
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
+        public string Title { get; set; } = "Datasilk Core Template";
+        public string Description { get; set; } = "You can do everything you ever wanted";
+        public string Theme { get; set; } = "default";
 
         private User user;
 
@@ -21,10 +22,23 @@ namespace CoreTemplate
 
         public override string Render(string body = "")
         {
-            Title = "CoreTemplate";
-            Description = "You can do everything you ever wanted";
             Scripts.Append("<script language=\"javascript\">S.svg.load('/images/icons.svg');</script>");
-            return base.Render(body);
+            var view = new View("/Views/Shared/layout.html");
+            //add head meta data
+            view["title"] = Title;
+            view["description"] = Description;
+            //set CSS theme
+            view["theme"] = Theme;
+            //set user language
+            view["language"] = User.Language;
+            //add page content
+            view["body"] = body;
+            //add any CSS stylesheets
+            view["head-css"] = Css.ToString();
+            //add any JS script files
+            view["scripts"] = Scripts.ToString();
+
+            return view.Render();
         }
 
         public void LoadHeader(ref View view)
